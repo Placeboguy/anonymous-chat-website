@@ -17,13 +17,22 @@ export default function Chat() {
   }, [messages]);
 
   useEffect(() => {
-    ws.current = new WebSocket("wss://" + window.location.host + "/api/chat");
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/api/chat`;
+    ws.current = new WebSocket(wsUrl);
     
     ws.current.onopen = () => {
       setIsConnected(true);
+      console.log('WebSocket Connected');
     };
 
     ws.current.onclose = () => {
+      setIsConnected(false);
+      console.log('WebSocket Disconnected');
+    };
+
+    ws.current.onerror = (error) => {
+      console.error('WebSocket Error:', error);
       setIsConnected(false);
     };
 
